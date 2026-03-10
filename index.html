@@ -384,6 +384,16 @@ img{display:block;max-width:100%;height:auto}
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 .skip-nav{position:absolute;top:-100%;left:16px;background:var(--gold);color:var(--night);padding:10px 20px;font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;z-index:99999;border-radius:0 0 4px 4px;transition:top .3s}
 .skip-nav:focus{top:0}
+
+/* LANGUAGE TOGGLE */
+.lang-toggle{display:flex;align-items:center;gap:2px;margin-left:24px}
+.lang-toggle button{font-family:var(--sans);font-size:10px;font-weight:400;letter-spacing:.1em;color:rgba(232,228,220,.35);background:none;border:none;cursor:pointer;padding:4px 8px;transition:color .3s;text-transform:uppercase}
+.lang-toggle button.active{color:var(--gold);font-weight:500}
+.lang-toggle button:hover{color:var(--bone)}
+.lang-sep{width:1px;height:10px;background:rgba(232,228,220,.15)}
+.mob-lang{display:flex;gap:20px;margin-top:16px}
+.mob-lang button{font-family:var(--serif);font-size:18px;color:rgba(232,228,220,.35);background:none;border:none;cursor:pointer;transition:color .3s}
+.mob-lang button.active{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -409,6 +419,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
     <li><a href="#founder">Founder</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
+  <div class="lang-toggle" id="langToggle"><button class="active" data-lang="en">EN</button><div class="lang-sep"></div><button data-lang="it">IT</button></div>
   <button class="mob-toggle" id="mobBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
 </nav>
 <div class="mob-menu" id="mobMenu">
@@ -417,6 +428,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   <a href="#services">Services</a>
   <a href="#founder">Founder</a>
   <a href="#contact">Contact</a>
+<div class="mob-lang" id="mobLang"><button class="active" data-lang="en">English</button><button data-lang="it">Italiano</button></div>
 </div>
 
 <!-- ═══ HERO with Structured Alps Panorama ═══ -->
@@ -1165,6 +1177,335 @@ document.getElementById('contactForm').addEventListener('submit',function(e){
     }
   });
 })();
+</script>
+
+<script id="i18n-system">
+/* ═══ MULTILINGUAL SYSTEM ═══ */
+(function(){
+var currentLang='en';
+
+/* Translation entries: [cssSelector, englishHTML, italianHTML, isMultiple, useHTML] */
+/* For isMultiple=true, en/it are arrays matched by index */
+var T=[
+// PAGE TITLE
+['title','Montavia Relocation — Italy &amp; Switzerland Cross-Border Relocation for UHNW Families','Montavia Relocation — Trasferimento Transfrontaliero Italia e Svizzera per Famiglie UHNW',false,false],
+
+// PRELOADER
+['.preloader-tag','Swiss Precision. Italian Lifestyle.','Precisione Svizzera. Stile di Vita Italiano.',false,false],
+
+// HERO
+['.hero-tag','Cross-Border Residency &amp; Tax Structuring for Principals, Founders &amp; Family Offices','Residenza Transfrontaliera e Pianificazione Fiscale per Titolari, Fondatori e Family Office',false,true],
+['.hero h1','Swiss Precision.<br><em>Italian Lifestyle.</em>','Precisione Svizzera.<br><em>Stile di Vita Italiano.</em>',false,true],
+['.hero-sub','One advisory desk coordinating residency, taxation, banking, property, and family integration across Italy and Switzerland — from initial strategy through post-move compliance.','Un unico desk consulenziale che coordina residenza, fiscalità, banking, immobili e integrazione familiare tra Italia e Svizzera — dalla strategia iniziale alla compliance post-trasferimento.',false,false],
+['.hero-cta','Request a Confidential Briefing','Richiedi un Briefing Riservato',false,false],
+['.scroll-hint span','Scroll','Scorri',false,false],
+
+// AUTHORITY STRIP
+['.auth-inner span',
+['Chambers-Ranked Immigration Counsel','Big-4 Tax Advisory Network','Swiss Private Banking Introductions','25 Years On the Ground'],
+['Consulenti Immigrazione Classificati Chambers','Network Consulenza Fiscale Big-4','Introduzioni Private Banking Svizzere','25 Anni sul Territorio'],
+true,false],
+
+// POSITION
+['#approach blockquote','Over 6,500 high-net-worth individuals relocate to Italy and Switzerland each year. Most navigate it through a patchwork of advisors across two legal systems. <em>Montavia delivers it from one desk.</em>','Oltre 6.500 individui ad alto patrimonio si trasferiscono in Italia e Svizzera ogni anno. La maggior parte affronta il processo attraverso una rete frammentata di consulenti in due sistemi giuridici. <em>Montavia gestisce tutto da un unico desk.</em>',false,true],
+['#approach .container > p','Montavia Relocation is the private advisory for internationally mobile individuals and families establishing residence in Italy or Switzerland. We manage every phase — tax structuring, residency permits, property, construction oversight, banking, education, and post-move compliance — through a closed network of vetted specialists built over 25 years on the ground. Every step documented. Every milestone accountable. One point of contact.','Montavia Relocation è la consulenza privata per individui e famiglie internazionalmente mobili che stabiliscono la residenza in Italia o Svizzera. Gestiamo ogni fase — pianificazione fiscale, permessi di soggiorno, immobili, supervisione lavori, banking, istruzione e compliance post-trasferimento — attraverso una rete chiusa di specialisti selezionati, costruita in oltre 25 anni sul territorio. Ogni passaggio documentato. Ogni traguardo verificabile. Un unico punto di contatto.',false,false],
+
+// CLIENTS
+['.clients .stag','Client Qualification','Qualifica del Cliente',false,false],
+['.clients .sh','Who Montavia Works With','Con Chi Lavora Montavia',false,false],
+['.client-card h4',
+['Founders &amp; Exits','Family Offices','Investors &amp; HNWI','US &amp; UK Nationals','Gulf-Based Families','Professionals &amp; Executives'],
+['Fondatori &amp; Exit','Family Office','Investitori &amp; HNWI','Cittadini US &amp; UK','Famiglie del Golfo','Professionisti &amp; Dirigenti'],
+true,true],
+['.client-card p',
+['Entrepreneurs post-exit seeking tax-efficient European residency with lifestyle integration',
+'Relocating principals and key personnel with multi-jurisdictional structuring requirements',
+'Individuals entering Italy\u2019s \u20ac300K flat-tax regime or Swiss Pauschalbesteuerung',
+'Americans establishing European residency and UK non-doms seeking post-Brexit alternatives',
+'UAE, Saudi, and Qatari families seeking European education, property, and lifestyle access',
+'Senior executives and skilled professionals qualifying for Italy\u2019s Impatriati 50% income exemption'],
+['Imprenditori post-exit alla ricerca di residenza europea fiscalmente efficiente con integrazione lifestyle',
+'Trasferimento di titolari e personale chiave con esigenze di strutturazione multi-giurisdizionale',
+'Individui che accedono al regime flat tax italiano da \u20ac300K o alla Pauschalbesteuerung svizzera',
+'Americani che stabiliscono la residenza europea e non-dom britannici in cerca di alternative post-Brexit',
+'Famiglie emiratine, saudite e qatariote alla ricerca di istruzione, immobili e accesso lifestyle europeo',
+'Dirigenti e professionisti qualificati per il regime Impatriati italiano con esenzione del 50%'],
+true,false],
+
+// VB1
+['.vb:first-of-type .vb-text h3','Every jurisdiction. Every milestone.<br>One structured process.','Ogni giurisdizione. Ogni traguardo.<br>Un processo strutturato.',false,true],
+['.vb:first-of-type .vb-text p','From initial assessment to full integration — every step is mapped, measured, and executed.','Dalla valutazione iniziale alla piena integrazione — ogni passaggio è mappato, misurato e realizzato.',false,false],
+
+// NUMBERS
+['.num-lbl',
+['Millionaires relocating<br>to Italy annually','Millionaires relocating<br>to Switzerland annually','On-the-ground network<br>across both nations','Italian flat-tax<br>regime duration'],
+['Milionari che si trasferiscono<br>in Italia ogni anno','Milionari che si trasferiscono<br>in Svizzera ogni anno','Rete operativa sul territorio<br>in entrambe le nazioni','Durata del regime<br>flat tax italiano'],
+true,true],
+
+// PROGRAMMES
+['.programmes .stag','Two Programmes. One Accountable Desk.','Due Programmi. Un Unico Desk Responsabile.',false,false],
+['.programmes .sh','The Complete Cross-Border<br>Relocation Architecture','L\u2019Architettura Completa per il<br>Trasferimento Transfrontaliero',false,true],
+['.prog:first-of-type .prog-name','_FLAG_The Vita Programme','_FLAG_Il Programma Vita',false,true],
+['.prog:first-of-type .prog-tagline','Strategic Relocation to Italy','Trasferimento Strategico in Italia',false,false],
+['.prog:last-of-type .prog-name','_FLAG_The Helvetia Programme','_FLAG_Il Programma Helvetia',false,true],
+['.prog:last-of-type .prog-tagline','Structured Residency in Switzerland','Residenza Strutturata in Svizzera',false,false],
+
+// COVERAGE
+['.coverage .stag','Full Geographic Coverage','Copertura Geografica Completa',false,false],
+['.coverage .sh','Every Region. Every Canton.','Ogni Regione. Ogni Cantone.',false,false],
+['.cov-col:first-child h3','Italy — North to South','Italia — Da Nord a Sud',false,false],
+['.cov-col:last-child h3','Switzerland — All Cantons','Svizzera — Tutti i Cantoni',false,false],
+
+// VB2
+['.vb:last-of-type .vb-text h3','Property acquisition.<br>Renovation oversight. <em style="color:var(--gold-light);font-style:italic">Precision execution.</em>','Acquisizione immobiliare.<br>Supervisione ristrutturazioni. <em style="color:var(--gold-light);font-style:italic">Esecuzione precisa.</em>',false,true],
+['.vb:last-of-type .vb-text p','Every detail planned, every phase managed — from sourcing to completion.','Ogni dettaglio pianificato, ogni fase gestita — dalla ricerca al completamento.',false,false],
+
+// SERVICES
+['#services .stag','Six Pillars of Execution','Sei Pilastri di Esecuzione',false,false],
+['#services .sh','The Montavia Infrastructure','L\u2019Infrastruttura Montavia',false,false],
+['.svc h3',
+['Tax &amp; Residency Strategy','Legal &amp; Immigration Structuring','Private Banking &amp; Wealth Interface','Property Acquisition &amp; Renovation','Family Integration','Governance &amp; Confidential Execution'],
+['Strategia Fiscale &amp; di Residenza','Strutturazione Legale &amp; Immigrazione','Private Banking &amp; Interfaccia Patrimoniale','Acquisizione Immobiliare &amp; Ristrutturazione','Integrazione Familiare','Governance &amp; Esecuzione Riservata'],
+true,true],
+['.svc p',
+['Pre-move modelling across both fiscal regimes. Italy flat-tax structuring. Swiss lump-sum coordination. Treaty optimisation under the CH\u2013IT double taxation agreement. Succession planning bridging cantonal and Italian inheritance frameworks.',
+'Full permit management \u2014 Swiss B and C permits, Italian investor visas, and precise residency timing. Working alongside Chambers-ranked immigration counsel to avoid dual-year complications and exit-tax exposure.',
+'Pre-screened introductions to leading Swiss private banks \u2014 Lombard Odier, Julius Baer, Pictet, EFG. Account structuring, KYC acceleration, asset transfer coordination, and mortgage facilitation in both jurisdictions.',
+'Off-market property sourcing, due diligence coordination, Lex Koller compliance for Swiss purchases. Full renovation oversight through trusted construction partners \u2014 Northern and Southern Italy, plus key Swiss locations.',
+'International school placement and application management. Private healthcare registration. Household staffing \u2014 from au pairs to estate managers. Club memberships, cultural introductions, and the networks that matter.',
+'Single point of accountability across every specialist. Municipal navigation through direct relationships with local authorities and retired officials. Ongoing compliance, annual renewals, and administrative oversight under strict confidentiality.'],
+['Modellazione pre-trasferimento su entrambi i regimi fiscali. Strutturazione flat tax italiano. Coordinamento imposizione forfettaria svizzera. Ottimizzazione dei trattati nell\u2019ambito della convenzione sulla doppia imposizione CH\u2013IT. Pianificazione successoria tra i sistemi ereditari cantonali e italiani.',
+'Gestione completa dei permessi \u2014 permessi svizzeri B e C, visti investitore italiani e tempistiche precise di residenza. Collaborazione con consulenti immigrazione classificati Chambers per evitare complicazioni di doppio anno fiscale ed esposizione a exit tax.',
+'Introduzioni pre-selezionate alle principali banche private svizzere \u2014 Lombard Odier, Julius Baer, Pictet, EFG. Strutturazione conti, accelerazione KYC, coordinamento trasferimento asset e facilitazione mutui in entrambe le giurisdizioni.',
+'Ricerca immobiliare off-market, coordinamento due diligence, conformità Lex Koller per acquisti in Svizzera. Supervisione completa ristrutturazioni attraverso partner di costruzione affidabili \u2014 Nord e Sud Italia, più le principali località svizzere.',
+'Inserimento scolastico internazionale e gestione candidature. Registrazione sanitaria privata. Personale domestico \u2014 da au pair a estate manager. Iscrizioni a club, introduzioni culturali e le reti che contano.',
+'Unico punto di responsabilità su ogni specialista. Navigazione municipale attraverso rapporti diretti con autorità locali e funzionari in pensione. Compliance continua, rinnovi annuali e supervisione amministrativa sotto stretta riservatezza.'],
+true,false],
+['.svc-bench',
+['<strong>Coordinated With</strong>Big-4 Tax Advisors<br>&amp; Swiss Fiduciaries',
+'<strong>Coordinated With</strong>Chambers-Ranked<br>Immigration Counsel',
+'<strong>Introductions To</strong>Pictet \xb7 Lombard Odier<br>Julius Baer \xb7 EFG',
+'<strong>Delivered By</strong>Vetted Local Partners<br>Across All Regions',
+'<strong>Covering</strong>Top-Tier International<br>Schools &amp; Private Healthcare',
+'<strong>Standard</strong>Family-Office<br>Operating Protocol'],
+['<strong>Coordinato Con</strong>Consulenti Fiscali Big-4<br>&amp; Fiduciari Svizzeri',
+'<strong>Coordinato Con</strong>Consulenti Immigrazione<br>Classificati Chambers',
+'<strong>Introduzioni A</strong>Pictet \xb7 Lombard Odier<br>Julius Baer \xb7 EFG',
+'<strong>Eseguito Da</strong>Partner Locali Selezionati<br>In Tutte le Regioni',
+'<strong>Copertura</strong>Scuole Internazionali<br>di Primo Livello &amp; Sanità Privata',
+'<strong>Standard</strong>Protocollo Operativo<br>Family Office'],
+true,true],
+
+// DIFFERENTIATORS
+['#difference .stag','Category Distinction','Distinzione di Categoria',false,false],
+['#difference .sh','Why Montavia. Not Anyone Else.','Perché Montavia. E Nessun Altro.',false,false],
+['.diff-card h3',
+['Dual Mastery<em>Equal depth. Both jurisdictions.</em>',
+'25-Year Network<em>Relationships, not referrals.</em>',
+'Municipal Access<em>The advantage no one else has.</em>',
+'Build Capability<em>Beyond sourcing \u2014 execution.</em>',
+'Single Desk<em>You call one number.</em>',
+'Trilingual Fluency<em>English. German. Italian.</em>'],
+['Doppia Competenza<em>Uguale profondità. Entrambe le giurisdizioni.</em>',
+'Rete di 25 Anni<em>Relazioni, non referral.</em>',
+'Accesso Municipale<em>Il vantaggio che nessun altro ha.</em>',
+'Capacità Costruttiva<em>Oltre la ricerca \u2014 esecuzione.</em>',
+'Desk Unico<em>Un solo numero da chiamare.</em>',
+'Trilinguismo Nativo<em>Inglese. Tedesco. Italiano.</em>'],
+true,true],
+['.diff-card p',
+['Not a Swiss firm with an Italian afterthought. Not an Italian firm pretending to understand cantonal tax law. Equal expertise in both \u2014 because the corridor demands it.',
+'Attorneys, accountants, municipal officials, construction partners, private bankers \u2014 built over two decades across Italy and Switzerland. When we call, things happen immediately.',
+'Direct relationships with local authorities and retired officials who navigate municipal processes with precision. Compliance without friction. Registration without delay.',
+'Trusted construction and renovation partners across all Italian regions. We don\u2019t just find your property \u2014 we oversee its transformation with on-the-ground project management.',
+'One dedicated advisor coordinates ten specialists. Tax counsel, immigration lawyers, bankers, property agents, schools \u2014 orchestrated through a single, accountable point of contact.',
+'Every conversation, every document, every negotiation \u2014 conducted natively in your language and the language of the jurisdiction. Nothing is lost in translation.'],
+['Non una società svizzera con un ripensamento italiano. Non una società italiana che finge di comprendere il diritto tributario cantonale. Competenza paritaria in entrambe \u2014 perché il corridoio lo esige.',
+'Avvocati, commercialisti, funzionari municipali, partner edili, banchieri privati \u2014 costruito in oltre vent\u2019anni tra Italia e Svizzera. Quando chiamiamo, le cose accadono immediatamente.',
+'Rapporti diretti con autorità locali e funzionari in pensione che navigano i processi municipali con precisione. Conformità senza attriti. Registrazione senza ritardi.',
+'Partner di costruzione e ristrutturazione affidabili in tutte le regioni italiane. Non ci limitiamo a trovare il vostro immobile \u2014 supervisioniamo la sua trasformazione con gestione del progetto sul territorio.',
+'Un consulente dedicato coordina dieci specialisti. Consulenti fiscali, avvocati per l\u2019immigrazione, banchieri, agenti immobiliari, scuole \u2014 orchestrati attraverso un unico punto di contatto responsabile.',
+'Ogni conversazione, ogni documento, ogni negoziazione \u2014 condotta nativamente nella vostra lingua e in quella della giurisdizione. Nulla si perde nella traduzione.'],
+true,false],
+
+// FOUNDER
+['#founder .stag','The Advisory Principal','Il Consulente Principale',false,false],
+['#founder h2','Luke Espir','Luke Espir',false,false],
+['.founder-role','Founder, Montavia Relocation \xb7 Managing Director, Lukevent AG','Fondatore, Montavia Relocation \xb7 Amministratore Delegato, Lukevent AG',false,false],
+['.founder-content > p:first-of-type','Luke has operated at the intersection of Switzerland, Italy, and Germany for over 25 years \u2014 building one of Europe\u2019s most extensive private networks across municipal authorities, property developers, tax advisors, and immigration counsel in the Alpine corridor.','Luke opera all\u2019intersezione tra Svizzera, Italia e Germania da oltre 25 anni \u2014 costruendo una delle reti private più estese d\u2019Europa tra autorità municipali, sviluppatori immobiliari, consulenti fiscali e legali per l\u2019immigrazione nel corridoio alpino.',false,false],
+['.founder-content > p:nth-of-type(2)','Before founding Montavia, Luke built Lukevent AG into a leading boutique event consultancy serving discerning international clients. That same network \u2014 and the same commitment to institutional-grade execution under strict confidentiality \u2014 now powers every Montavia relocation.','Prima di fondare Montavia, Luke ha trasformato Lukevent AG in una boutique di consulenza eventi leader al servizio di clienti internazionali esigenti. La stessa rete \u2014 e lo stesso impegno per un\u2019esecuzione di livello istituzionale sotto stretta riservatezza \u2014 alimenta oggi ogni trasferimento Montavia.',false,false],
+['.founder-stat span',
+['Years in CH\u2013IT Corridor','Languages Native','Jurisdictions Mastered'],
+['Anni nel Corridoio CH\u2013IT','Lingue Native','Giurisdizioni Padroneggiate'],
+true,false],
+
+// CASE STUDY
+['.case-header .stag','Execution Proof','Prova di Esecuzione',false,false],
+['.case-header .sh','Case Example \u2014 Anonymised','Caso Esemplificativo \u2014 Anonimizzato',false,false],
+['.case-label',
+['Client Profile','Origin','Destination','Timeline','Scope of Engagement'],
+['Profilo del Cliente','Origine','Destinazione','Tempistica','Ambito dell\u2019Incarico'],
+true,false],
+['.case-val',
+['Technology founder, post-exit. Family of four.','California, United States','Florence, Italy','Initial strategy to move completion: 6 months'],
+['Fondatore tecnologico, post-exit. Famiglia di quattro persone.','California, Stati Uniti','Firenze, Italia','Dalla strategia iniziale al completamento: 6 mesi'],
+true,false],
+['.case-scope li',
+['Italian investor visa structuring',
+'\u20ac300K flat-tax election (Art. 24-bis TUIR)',
+'Swiss private banking structure retained',
+'Off-market property acquisition in Florence',
+'Renovation oversight \u2014 4-month timeline managed',
+'International school placement for two children',
+'Municipal registration and post-move compliance'],
+['Strutturazione visto investitore italiano',
+'Elezione flat tax \u20ac300K (Art. 24-bis TUIR)',
+'Struttura private banking svizzera mantenuta',
+'Acquisizione immobiliare off-market a Firenze',
+'Supervisione ristrutturazione \u2014 4 mesi gestiti',
+'Inserimento scolastico internazionale per due figli',
+'Registrazione municipale e compliance post-trasferimento'],
+true,false],
+['.case-outcome p','All worldwide income covered under a single annual flat-tax payment. Family residency secured. Children enrolled. Property renovated and occupied within six months of first briefing.','Tutto il reddito mondiale coperto da un unico pagamento annuale flat tax. Residenza familiare ottenuta. Figli iscritti. Immobile ristrutturato e occupato entro sei mesi dal primo briefing.',false,false],
+
+// PROCESS
+['.process .stag','Structured Execution','Esecuzione Strutturata',false,false],
+['.process .sh','The Montavia 6-Phase Process','Il Processo Montavia in 6 Fasi',false,false],
+['.tl-label',
+['Confidential Briefing','Fiscal Modelling','Residency Strategy','Banking &amp; Structuring','Property Acquisition','Family Integration'],
+['Briefing Riservato','Modellazione Fiscale','Strategia di Residenza','Banking &amp; Strutturazione','Acquisizione Immobiliare','Integrazione Familiare'],
+true,true],
+['.tl-sub',
+['Week 1','Weeks 2\u20133','Weeks 3\u20135','Weeks 4\u20138','Months 2\u20136','Months 3\u201312'],
+['Settimana 1','Settimane 2\u20133','Settimane 3\u20135','Settimane 4\u20138','Mesi 2\u20136','Mesi 3\u201312'],
+true,false],
+
+// PREVIEW
+['.preview .stag','Before You Commit','Prima di Impegnarvi',false,false],
+['.preview-inner h2','The Relocation Preview','L\u2019Anteprima del Trasferimento',false,false],
+['.preview-price','3\u20135 Days On the Ground \xb7 From <span>\u20ac10,000</span>','3\u20135 Giorni sul Territorio \xb7 A Partire da <span>\u20ac10.000</span>',false,true],
+['.preview-inner > p','A structured due-diligence immersion for families exploring life in Italy or Switzerland. Not a tour \u2014 a framework for making an informed decision, delivered with the people who will execute your relocation.','Un\u2019immersione strutturata di due diligence per famiglie che esplorano la vita in Italia o Svizzera. Non un tour \u2014 un framework per prendere una decisione informata, condotto dalle persone che realizzeranno il vostro trasferimento.',false,false],
+['.preview-feat',
+['Tax Advisor Meeting','Private Banker Introduction','Property Viewings','School Visits','Municipal Orientation','Neighbourhood Immersion'],
+['Incontro Consulente Fiscale','Introduzione Banchiere Privato','Visite Immobiliari','Visite Scolastiche','Orientamento Municipale','Immersione nel Quartiere'],
+true,false],
+['.preview-inner .btn-outline','Request a Preview','Richiedi un\u2019Anteprima',false,false],
+
+// TESTIMONIALS
+['.testimonial-slide blockquote',
+['We left Dubai expecting chaos \u2014 new tax rules, residence permits, finding the right international school in Ticino. Montavia had every step mapped out before we even landed.',
+'Moving from the US to Italy felt overwhelming on paper. Montavia handled the visa process, found us a home near Santo Spirito, and even helped our children settle into their new school \u2014 all before our container ship arrived.',
+'We wanted the Puglia lifestyle but had no idea where to start with Italian bureaucracy. Montavia guided us through every permit, every document, and introduced us to people who made Bari feel like home from day one.'],
+['Siamo partiti da Dubai aspettandoci il caos \u2014 nuove regole fiscali, permessi di soggiorno, trovare la scuola internazionale giusta in Ticino. Montavia aveva ogni passaggio pianificato prima ancora che atterrassimo.',
+'Trasferirsi dagli USA in Italia sembrava travolgente sulla carta. Montavia ha gestito il processo del visto, ci ha trovato una casa vicino a Santo Spirito, e ha persino aiutato i nostri figli a inserirsi nella nuova scuola \u2014 tutto prima che arrivasse il nostro container.',
+'Volevamo lo stile di vita pugliese ma non avevamo idea di dove iniziare con la burocrazia italiana. Montavia ci ha guidato attraverso ogni permesso, ogni documento, e ci ha presentato persone che hanno fatto sentire Bari come casa dal primo giorno.'],
+true,false],
+['.testimonial-slide cite',
+['Private Client \u2014 UAE-Based Family Office Principal, Now Resident in Lugano',
+'Private Client \u2014 Technology Founder, Relocated from California to Florence',
+'Private Client \u2014 UK Non-Dom Family, Relocated Post-Brexit to Puglia'],
+['Cliente Privato \u2014 Titolare Family Office con base negli UAE, Ora Residente a Lugano',
+'Cliente Privato \u2014 Fondatore Tecnologico, Trasferitosi dalla California a Firenze',
+'Cliente Privato \u2014 Famiglia UK Non-Dom, Trasferitasi Post-Brexit in Puglia'],
+true,false],
+
+// SEO
+['.seo-inner h2','Relocating to Italy or Switzerland as a High-Net-Worth Individual','Trasferirsi in Italia o Svizzera come Individuo ad Alto Patrimonio',false,false],
+['.seo-inner p:first-of-type','Whether you are considering Italy\u2019s \u20ac300,000 flat-tax regime for foreign income, Switzerland\u2019s lump-sum taxation (Pauschalbesteuerung), or an Italian investor visa from \u20ac250,000, the structuring decisions made before your move define everything that follows \u2014 from inheritance exposure to banking access to your children\u2019s school placement.','Che stiate considerando il regime flat tax italiano da \u20ac300.000 per i redditi esteri, l\u2019imposizione forfettaria svizzera (Pauschalbesteuerung), o un visto investitore italiano da \u20ac250.000, le decisioni di strutturazione prese prima del trasferimento definiscono tutto ciò che segue \u2014 dall\u2019esposizione ereditaria all\u2019accesso bancario all\u2019inserimento scolastico dei vostri figli.',false,false],
+['.seo-inner p:nth-of-type(2)','Montavia advises principals relocating from the United States, United Kingdom, UAE, and across Europe. Our mandates span Milan, Lake Como, Florence, Lugano, Zug, Zurich, and Geneva \u2014 wherever the Alpine residency corridor meets your family\u2019s needs. We coordinate tax advisors, immigration counsel, Swiss private bankers, and property specialists under one confidential mandate.','Montavia consiglia titolari che si trasferiscono da Stati Uniti, Regno Unito, UAE e da tutta Europa. I nostri mandati coprono Milano, Lago di Como, Firenze, Lugano, Zugo, Zurigo e Ginevra \u2014 ovunque il corridoio di residenza alpino incontri le esigenze della vostra famiglia. Coordiniamo consulenti fiscali, legali per l\u2019immigrazione, banchieri privati svizzeri e specialisti immobiliari sotto un unico mandato riservato.',false,false],
+['.seo-inner p:nth-of-type(3)','We also prepare a private <strong>2026 Relocation Strategy Briefing</strong> \u2014 a jurisdiction-by-jurisdiction comparison covering Italy\u2019s flat-tax regime, Swiss lump-sum structures, property restrictions, banking timelines, and family integration pathways. Available on request during your <a href="#contact">confidential consultation</a>.','Prepariamo inoltre un <strong>Briefing Strategico di Trasferimento 2026</strong> privato \u2014 un confronto giurisdizione per giurisdizione che copre il regime flat tax italiano, le strutture forfettarie svizzere, le restrizioni immobiliari, le tempistiche bancarie e i percorsi di integrazione familiare. Disponibile su richiesta durante la vostra <a href="#contact">consulenza riservata</a>.',false,true],
+
+// CONTACT
+['.contact-left h2','Request a Private Relocation Strategy Session','Richiedi una Sessione Strategica Privata di Trasferimento',false,false],
+['.contact-left > p','A 30-minute strategic consultation covering Italy vs Switzerland tax positioning, residency pathway analysis, and banking and property considerations. Montavia accepts a limited number of relocation mandates per year to maintain discretion and execution quality.','Una consulenza strategica di 30 minuti che copre il posizionamento fiscale Italia vs Svizzera, l\u2019analisi dei percorsi di residenza e le considerazioni su banking e immobili. Montavia accetta un numero limitato di mandati di trasferimento all\u2019anno per mantenere discrezione e qualità dell\u2019esecuzione.',false,false],
+['.office','Advisory Office \u2014 Zug<span>Rothusstrasse 21, 6331 H\xfcnenberg, Switzerland<br>Switzerland\u2019s global centre for international tax residency</span>','Ufficio Consulenziale \u2014 Zugo<span>Rothusstrasse 21, 6331 H\xfcnenberg, Svizzera<br>Centro globale svizzero per la residenza fiscale internazionale</span>',false,true],
+['.form-btn','Send Confidential Inquiry','Invia Richiesta Riservata',false,false],
+['.form-note','All consultations are conducted under strict confidentiality. Montavia does not provide legal or tax advice directly \u2014 we coordinate with licensed professionals in each jurisdiction.','Tutte le consulenze sono condotte sotto stretta riservatezza. Montavia non fornisce consulenza legale o fiscale direttamente \u2014 ci coordiniamo con professionisti abilitati in ogni giurisdizione.',false,false],
+['#formSuccess h3','Inquiry Received','Richiesta Ricevuta',false,false],
+['#formSuccess p','Thank you. A member of our advisory team will respond within 24 hours.','Grazie. Un membro del nostro team consulenziale risponderà entro 24 ore.',false,false],
+
+// FOOTER
+['.footer-tag','Swiss Precision. Italian Lifestyle.','Precisione Svizzera. Stile di Vita Italiano.',false,false],
+['.footer-legal','&copy; 2026 Montavia Relocation &middot; A LukeEvent AG venture &middot; Rothusstrasse 21, 6331 H\xfcnenberg, Switzerland<br>Montavia Relocation provides advisory and coordination services. Tax, legal, and immigration counsel is delivered by licensed professionals in each jurisdiction. All advisory services comply with Swiss and Italian regulatory frameworks. This website does not constitute legal or tax advice.','&copy; 2026 Montavia Relocation &middot; Un\u2019iniziativa LukeEvent AG &middot; Rothusstrasse 21, 6331 H\xfcnenberg, Svizzera<br>Montavia Relocation fornisce servizi di consulenza e coordinamento. La consulenza fiscale, legale e per l\u2019immigrazione è fornita da professionisti abilitati in ogni giurisdizione. Tutti i servizi consulenziali sono conformi ai quadri normativi svizzeri e italiani. Questo sito web non costituisce consulenza legale o fiscale.',false,true],
+
+// NAV LINKS
+['.nav-links a',
+['Approach','Programmes','Services','Founder','Contact'],
+['Approccio','Programmi','Servizi','Fondatore','Contatto'],
+true,false],
+
+// MOBILE MENU LINKS
+['.mob-menu > a',
+['Approach','Programmes','Services','Founder','Contact'],
+['Approccio','Programmi','Servizi','Fondatore','Contatto'],
+true,false]
+];
+
+/* FORM PLACEHOLDERS */
+var FP={
+'input[name="name"]':['Full Name','Nome Completo'],
+'input[name="email"]':['Email Address','Indirizzo Email'],
+'input[name="residence"]':['Current Country of Residence','Paese di Residenza Attuale'],
+'textarea[name="message"]':['Tell us briefly about your situation and goals','Descriveteci brevemente la vostra situazione e i vostri obiettivi']
+};
+
+function setLang(lang){
+  currentLang=lang;
+  document.documentElement.lang=lang;
+  var idx=lang==='en'?0:1;
+
+  T.forEach(function(entry){
+    var sel=entry[0],en=entry[1],it=entry[2],multi=entry[3],useH=entry[4];
+    var els=document.querySelectorAll(sel);
+    if(!els.length)return;
+
+    if(multi){
+      var texts=lang==='en'?en:it;
+      els.forEach(function(el,i){
+        if(i<texts.length){
+          /* Skip programme name flag SVGs */
+          if(typeof texts[i]==='string'&&texts[i].indexOf('_FLAG_')===0){
+            var svg=el.querySelector('svg');
+            var svgHTML=svg?svg.outerHTML:'';
+            el.innerHTML=svgHTML+texts[i].replace('_FLAG_','');
+          } else if(useH){
+            el.innerHTML=texts[i];
+          } else {
+            el.textContent=texts[i];
+          }
+        }
+      });
+    } else {
+      var text=lang==='en'?en:it;
+      var el=els[0];
+      if(useH){el.innerHTML=text}
+      else{el.textContent=text}
+    }
+  });
+
+  /* Placeholders */
+  for(var sel in FP){
+    var el=document.querySelector(sel);
+    if(el)el.placeholder=FP[sel][idx];
+  }
+
+  /* Toggle buttons */
+  document.querySelectorAll('[data-lang]').forEach(function(btn){
+    btn.classList.toggle('active',btn.dataset.lang===lang);
+  });
+}
+
+/* BIND TOGGLES */
+document.querySelectorAll('[data-lang]').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    setLang(this.dataset.lang);
+  });
+});
+
+/* Expose globally for debugging */
+window.setLang=setLang;
+})();
+
 </script>
 </body>
 </html>
